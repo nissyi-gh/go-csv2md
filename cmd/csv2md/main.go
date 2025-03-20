@@ -48,5 +48,5 @@ func main() {
 
 	fmt.Println(headerRow)
 	fmt.Println(delimiterRow)
-	fmt.Println(dataRows)
+	fmt.Print(dataRows)
 }
