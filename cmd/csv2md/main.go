@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"encoding/csv"
 	"fmt"
 	"os"
@@ -21,32 +22,35 @@ func main() {
 	defer file.Close()
 
 	reader := csv.NewReader(file)
-	records, err := reader.ReadAll()
+	writer := bufio.NewWriter(os.Stdout)
+	defer writer.Flush()
+
+	header, err := reader.Read()
 	if err != nil {
 		fmt.Println("Error reading file:", err)
 	}
 
-	header := records[0]
 	headerRow := "|"
 	for _, h := range header {
 		headerRow += h + "|"
 	}
+	writer.WriteString(headerRow + "\n")
 
 	delimiterRow := "|"
 	for i := 0; i < len(header); i++ {
 		delimiterRow += "---|"
 	}
+	writer.WriteString(delimiterRow + "\n")
 
-	dataRows := ""
-	for _, record := range records[1:] {
-		dataRows += "|"
-		for _, d := range record {
-			dataRows += d + "|"
+	for {
+		record, err := reader.Read()
+		if err != nil {
+			break
 		}
-		dataRows += "\n"
+		dataRow := "|"
+		for _, d := range record {
+			dataRow += d + "|"
+		}
+		writer.WriteString(dataRow + "\n")
 	}
-
-	fmt.Println(headerRow)
-	fmt.Println(delimiterRow)
-	fmt.Print(dataRows)
 }
